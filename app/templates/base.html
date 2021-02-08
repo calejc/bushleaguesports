@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
+
+    <link href="/static/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container-fluid">
+
+      <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarToggler">
+
+          <!-- TODO: Static import not importing this image! -->
+          <!-- <a class="navbar-brand" href="/"> -->
+            <!-- <img class="nav-brand-img" src="/static/logo.png" style="height:45px;"> -->
+          <!-- </a> -->
+          
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/odds">Odds</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="/nhl" role="button" aria-haspopup="true" aria-expanded="false">NHL</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/nhl">NHL Home</a>
+                <a class="dropdown-item" href="/nhl/dfs">DFS</a>
+                <a class="dropdown-item" href="/nhl/stats">Stats</a>
+                <a class="dropdown-item" href="/nhl/lines">Line Combos</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    
+    <div class="container">
+
+
+      {% block body %}
+      {% endblock %}
+
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Vegas Odds{% endblock %}
+{% block body %}
+<div class="jumbotron" style="margin-top:6.5rem;">
+  <h1>Vegas Odds</h1>
+</div>
+{% for table in tables %}
+            {{ table|safe }}
+{% endfor %}
+{% endblock %}
