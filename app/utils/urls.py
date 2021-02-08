@@ -1,7 +1,7 @@
 import sys, os
 from dotenv import load_dotenv
-DIR = os.path.expanduser('~/Dropbox/code/python/flask/dfs') 
-load_dotenv(os.path.join(DIR, '.env'))
+# DIR = os.path.expanduser('~/Dropbox/code/python/flask/dfs') 
+# load_dotenv(os.path.join(DIR, '.env'))
 
 
 # Urls for use in all clients
@@ -214,7 +214,7 @@ def get_odds_url(sport, region, market):
         ODDS_API_ODDS = ODDS_API_ODDS
     )
     return url.format(
-        API_KEY = os.getenv('OP_API_KEY'),
+        API_KEY = os.environ('OP_API_KEY'),
         SPORT = sport,
         REGION = region,
         MARKET = market
