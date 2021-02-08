@@ -1,0 +1,7 @@
+__pycache__
+/bin/
+/include/
+/instance/
+/lib/
+dataframe.csv
+.env
