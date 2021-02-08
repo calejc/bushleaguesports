@@ -3,6 +3,11 @@ from bs4 import BeautifulSoup
 import pandas as pd, numpy as np, csv, requests, re, seaborn as sns
 from statistics import mean
 
+
+
+#  TODO: #
+# Stop scraping NST and use the NHL api. this does not seem to work when deployed to heroku
+
 def scrape(list, homeAway, range):
         url = "http://www.naturalstattrick.com/teamtable.php?fromseason=20202021&thruseason=20202021&stype=2&sit=ev&score=all&rate=y&team=all&loc={}&gpf={}&fd=&td=".format(homeAway, range)
         html = requests.get(url)

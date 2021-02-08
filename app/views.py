@@ -14,13 +14,7 @@ def vegas():
     return render_template('odds.html', tables=[df])
 
 # Under construction
-# @app.route('/nhl/', defaults={'leaf': 'dfs', 'leaf': 'lines'})
-@app.route('/nhl/')
-def nhl_home():
+@app.route('/nhl/', defaults={'leaf': 'dfs', 'leaf': 'stats', 'leaf': 'lines'})
+@app.route('/nhl/<string:leaf>')
+def nhl_home(leaf):
     return render_template('coming-soon.html')
-
-
-@app.route('/nhl/stats/')
-def nhl_stats():
-    df = pace.pace()
-    return render_template('nhl-stats.html', tables=[df])
