@@ -18,3 +18,8 @@ def vegas():
 @app.route('/nhl/<string:leaf>')
 def nhl_home(leaf):
     return render_template('coming-soon.html')
+
+
+@app.route('/nhl/stats/')
+def nhl_stats():
+    return render_template('nhl-stats')

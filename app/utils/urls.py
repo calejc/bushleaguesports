@@ -1,5 +1,6 @@
 import sys, os
 from dotenv import load_dotenv
+from enum import Enum
 # DIR = os.path.expanduser('~/Dropbox/code/python/flask/dfs') 
 # load_dotenv(os.path.join(DIR, '.env'))
 
@@ -13,12 +14,29 @@ from dotenv import load_dotenv
 NHL_BASE = 'nhl.com'
 NHL_SHIFTS = '/stats/rest/shiftcharts?cayenneExp=gameId={GAME_ID}'
 #-------------------------------------------------------#
+# https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#people
 NHL_API_BASE = 'https://statsapi.web.nhl.com/api/v1'
-NHL_API_TEAMS = '/teams'
+NHL_API_TEAMS = '/teams/{TEAM_ID}'
+NHL_API_STATS = '/stats'
+NHL_API_STAT_TYPES = '/statTypes'
+NHL_API_CONFIG = '/configurations' # Lists all endpoint return options
+NHL_API_SCHEDULE = '/schedule'
+NHL_API_GAME = '/game/{GAME_ID}'
+NHL_API_GAME_LIVE = '/feed/live'
+NHL_API_GAME_BOXSCORE = '/boxscore' 
+NHL_API_GAME_LINESCORE = '/linescore'
+NHL_API_GAME_CONTENT = '/content' # Media => videos, pictures of various plays
 NHL_API_TEAM_ROSTER = '/teams?expand=team.roster'
-NHL_API_SCHEDULE = '/schedule?teamId={TEAM_ID}&startDate={START_DATE}&endDate={END_DATE}'
-NHL_API_TEAM_SCHEDULE = '?teamId={TEAM_ID}&startDate={START_DATE}&endDate={END_DATE}'
-NHL_API_STAT_TYPES = 'statTypes'
+class NHL_API_MODIFIERS(Enum):
+    TEAM_ID = 'teamId'
+    START_DATE = 'startDate'
+    END_DATE = 'endDate'
+    SEASON = 'season'
+    DATE = 'date'
+    GAME_TYPE = 'gameType'
+    EXPAND = 'expand'
+class NHL_API_EXPAND_VALUES(Enum):
+    TEAM_ROSTER = 'team.roster'
 #-------------------------------------------------------#
 DK_API_BASE = 'https://api.draftkings.com'
 DK_DRAFTGROUPS_PATH = '/draftgroups/v1/'
@@ -49,6 +67,13 @@ MLB_API_TEAMS = '/teams'
 #-------------------------------------------------------#
 
 
+
+# ---------------- #
+#   Misc Helpers   #
+# ---------------- #
+# Unpack url modifiers to concat onto URL string
+def return_args(args):
+    return '?'+''.join(["{}={}&".format(k,v) for (k,v) in (arg for arg in args)]) if isinstance(args, list) else ''
 
 
 
@@ -117,16 +142,13 @@ def nst_line_url(p1, p2, p3, p4, p5):
 # ------------------ #
 #    NHL API URLs    #
 # ------------------ #
-def nhl_schedule_url(startDate, endDate):
-    url = "{NHL_API_BASE}{NHL_API_SCHEDULE}".format(
+def nhl_schedule_url(**kwargs):
+    modifiers = return_args(kwargs.get("modifiers", ""))
+    base_url = "{NHL_API_BASE}{NHL_API_SCHEDULE}".format(
         NHL_API_BASE = NHL_API_BASE,
         NHL_API_SCHEDULE = NHL_API_SCHEDULE
     )
-    return url.format(
-        TEAM_ID = teamId,
-        START_DATE = startDate,
-        END_DATE = endDate
-    )
+    return base_url + modifiers
 
 def shiftcharts_url(gameId):
     url = '{NHL_BASE}{NHL_SHIFTS}'.format(
@@ -137,16 +159,13 @@ def shiftcharts_url(gameId):
         GAME_ID = gameId
     )
 
-def nhl_teams_url():
-    return '{NHL_API_BASE}{NHL_API_TEAMS}'.format(
+def nhl_teams_url(**kwargs):
+    teamId = kwargs.get("teamId", '')
+    url = '{NHL_API_BASE}{NHL_API_TEAMS}'.format(
         NHL_API_BASE = NHL_API_BASE,
         NHL_API_TEAMS = NHL_API_TEAMS
     )
-
-def nhl_team_url(teamId):
-    return '{NHL_API_BASE}{NHL_API_TEAMS}/{TEAM_ID}'.format(
-        NHL_API_BASE = NHL_API_BASE,
-        NHL_API_TEAMS = NHL_API_TEAMS,
+    return url.format(
         TEAM_ID = teamId
     )
 
@@ -157,9 +176,12 @@ def nhl_stat_types_url(teamId):
     )
 
 def nhl_team_stats_url(teamId):
-    return '{NHL_API_BASE}{NHL_API_TEAMS}/{TEAM_ID}/stats'.format(
+    url = '{NHL_API_BASE}{NHL_API_TEAMS}{NHL_API_STATS}'.format(
         NHL_API_BASE = NHL_API_BASE,
         NHL_API_TEAMS = NHL_API_TEAMS,
+        NHL_API_STATS = NHL_API_STATS
+    )
+    return url.format(
         TEAM_ID = teamId
     )
 
@@ -167,18 +189,6 @@ def rosters_url():
     return '{NHL_API_BASE}{NHL_API_TEAM_ROSTER}'.format(
         NHL_API_BASE = NHL_API_BASE,
         NHL_API_TEAM_ROSTER = NHL_API_TEAM_ROSTER
-    )
-
-def teams_schedule_url(teamId, startDate, endDate):
-    url = '{NHL_API_BASE}{NHL_API_SCHEDULE}{NHL_API_TEAM_SCHEDULE}'.format(
-        NHL_API_BASE = NHL_API_BASE,
-        NHL_API_SCHEDULE = NHL_API_SCHEDULE,
-        NHL_API_TEAM_SCHEDULE = NHL_API_TEAM_SCHEDULE
-    )
-    return url.format(
-        TEAM_ID = teamId,
-        START_DATE = startDate,
-        END_DATE = endDate
     )
 
 

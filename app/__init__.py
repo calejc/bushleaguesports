@@ -2,8 +2,7 @@ from flask import Flask
 from flask_cors import CORS;
 from flask_scss import Scss
 
-app = Flask(__name__, instance_relative_config=True, static_url_path='', 
-            static_folder='/app/static')
+app = Flask(__name__, instance_relative_config=True)
 app.debug=True
 CORS(app)
 Scss(app, static_dir='app/static', asset_dir='app/assets/styles')
