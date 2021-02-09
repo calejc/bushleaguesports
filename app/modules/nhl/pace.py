@@ -3,11 +3,10 @@ from bs4 import BeautifulSoup
 import pandas as pd, numpy as np, csv, requests, re, seaborn as sns, sys, operator
 from statistics import mean
 sys.path.append('../..')
-import utils.urls as urls, utils.data as data, utils.helpers as helpers
+import app.utils.urls as urls, app.utils.data as data, app.utils.helpers as helpers
 
 
 def call_api(url):
-    print(url)
     r = requests.get(url)
     return r.json() if r.status_code is 200 else None
 
@@ -25,6 +24,7 @@ def games_subset(json_data, n):
 
 
 def stat_splits():
+    pass
 
 def pace():
     teamIds = [helpers.return_alt(data.NHL_TEAMS, team,'nhl_id') for team in data.NHL_TEAMS]
@@ -34,7 +34,7 @@ def pace():
         ('season', '20192020'),
         ('season', '20202021')
     ])), 50)
-    
+
     return
 
     # Create initial dataframes with cf/ca for h/a splits

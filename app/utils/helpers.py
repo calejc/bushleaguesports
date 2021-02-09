@@ -1,9 +1,9 @@
 import requests, os, sys, math
 sys.path.append("..")
-import datetime as dt, utils.data as data
+import datetime as dt, app.utils.data as data
 from selenium import webdriver
 from bs4 import BeautifulSoup
-from utils.urls import nst_team_url
+from app.utils.urls import nst_team_url
 
 
 def drive(url):
