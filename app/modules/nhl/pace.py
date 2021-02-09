@@ -1,32 +1,41 @@
 #!/usr/bin/env python3
 from bs4 import BeautifulSoup
-import pandas as pd, numpy as np, csv, requests, re, seaborn as sns
+import pandas as pd, numpy as np, csv, requests, re, seaborn as sns, sys, operator
 from statistics import mean
+sys.path.append('../..')
+import utils.urls as urls, utils.data as data, utils.helpers as helpers
 
 
+def call_api(url):
+    print(url)
+    r = requests.get(url)
+    return r.json() if r.status_code is 200 else None
 
-#  TODO: #
-# Stop scraping NST and use the NHL api. this does not seem to work when deployed to heroku
+def transform(json_data):
+    pass
 
-def scrape(list, homeAway, range):
-        url = "http://www.naturalstattrick.com/teamtable.php?fromseason=20202021&thruseason=20202021&stype=2&sit=ev&score=all&rate=y&team=all&loc={}&gpf={}&fd=&td=".format(homeAway, range)
-        html = requests.get(url)
-        soup = BeautifulSoup(html.text, 'html.parser')
-        table = soup.find('table', {'id': 'teams'})
-        tbody = table.find('tbody')
-        for tr in tbody.find_all('tr'):
-            team = [td for td in tr.find_all('td')[1]]
-            cf60 = [td for td in tr.find_all('td')[10]]
-            ca60 = [td for td in tr.find_all('td')[11]]
+def crawl_schedule(json_data):
+    pass
 
-            new_data = team + cf60 + ca60
-            list.append(new_data)
-        return list
+def games_subset(json_data, n):
+    # Get Regular Season ("R" gametype) games that are "Final"
+    # Return just game ID to then make a call to the game endpoint
+    # Sorted by most recent, splicing 'n' games
+    return sorted([x['games'][0]['gamePk'] for x in (y for y in json_data['dates']) if x['games'][0]['status']['abstractGameState'] == "Final" and x['games'][0]['gameType'] == "R"])[-n:]
+
+
+def stat_splits():
 
 def pace():
-    tmp_home = []
-    tmp_away = []
-
+    teamIds = [helpers.return_alt(data.NHL_TEAMS, team,'nhl_id') for team in data.NHL_TEAMS]
+    team_urls = [urls.nhl_team_stats_url(teamId = tid) for tid in teamIds]
+    games = games_subset(call_api(urls.nhl_schedule_url(modifiers = [
+        ('teamId', 5),
+        ('season', '20192020'),
+        ('season', '20202021')
+    ])), 50)
+    
+    return
 
     # Create initial dataframes with cf/ca for h/a splits
     # '410' for full season. '10' for last 10 games
@@ -110,3 +119,6 @@ def xPace(df):
     df.h_opp_pace = df.h_opp_pace.round(2)
     df = df[['team', 'cf/60_h', 'cf/60_a', 'ca/60_h', 'ca/60_a', 'pace_h', 'h_opp_pace', 'pace_a', 'a_opp_pace']]
     return df
+
+
+pace()
