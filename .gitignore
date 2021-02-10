@@ -3,5 +3,9 @@ __pycache__
 /include/
 /instance/
 /lib/
-dataframe.csv
+lib64
+*.cfg
+*.ini
+Procfile
+*.csv
 .env
