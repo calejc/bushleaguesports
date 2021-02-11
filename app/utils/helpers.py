@@ -1,33 +1,34 @@
-import requests, os, sys, math
+import requests, os, sys, math, seaborn as sns, pandas as pd
 sys.path.append("..")
 import datetime as dt, app.utils.data as data
-from selenium import webdriver
-from bs4 import BeautifulSoup
-from app.utils.urls import nst_team_url
 
 
-def drive(url):
-    driver = webdriver.Firefox(service_log_path=os.devnull)
-    driver.get(url)
-    html = driver.page_source
-    soup = BeautifulSoup(html, 'html.parser')
-    driver.close()
-    return soup
+def call_api(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as http_error:
+        print("Other error occurred:\t{http_error}".format(
+            http_error=http_error
+        ))
+        sys.exit()
+    except Exception as error:
+        print("Other error occurred:\t{error}".format(
+            error=error
+        ))
+        sys.exit()
+    else:
+        return response.json()
 
-def scrape(url):
-    html = requests.get(url)
-    soup = BeautifulSoup(html.text, 'html.parser')
-    return soup
 
-def scrape_nst(sit, score, loc, gpf, start_date, end_date):
-    url = nst_team_url(sit, score, loc, gpf, start_date, end_date)
-    html = requests.get(url)
-    soup = BeautifulSoup(html.text, 'html.parser')
-    return soup
-
-def scrape_json(url):
-    response = requests.get(url).json()
-    return response
+def style_df(df, **kwargs):
+    styles = kwargs.get("styles", data.Styles.DEFAULT)
+    cm = sns.light_palette("green", as_cmap=True)
+    return df.style.background_gradient(
+        cmap=cm,
+        axis=0,
+        subset=(pd.IndexSlice[2:], df.select_dtypes(float).columns)
+    ).set_precision(2).hide_index().set_table_styles(styles).render()
 
 def parse_link(link):
     to_replace = ['=', '%20', '&']

@@ -72,7 +72,7 @@ MLB_API_TEAMS = '/teams'
 #   Misc Helpers   #
 # ---------------- #
 # Unpack url modifiers to concat onto URL string
-def return_args(args):
+def format_query_params(args):
     return '?'+''.join(["{}={}&".format(k,v) for (k,v) in (arg for arg in args)]) if isinstance(args, list) else ''
 
 
@@ -143,7 +143,7 @@ def nst_line_url(p1, p2, p3, p4, p5):
 #    NHL API URLs    #
 # ------------------ #
 def nhl_schedule_url(**kwargs):
-    modifiers = return_args(kwargs.get("modifiers", ""))
+    modifiers = format_query_params(kwargs.get("modifiers", ""))
     base_url = "{NHL_API_BASE}{NHL_API_SCHEDULE}".format(
         NHL_API_BASE = NHL_API_BASE,
         NHL_API_SCHEDULE = NHL_API_SCHEDULE

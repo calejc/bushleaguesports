@@ -1,10 +1,38 @@
 {% extends "base.html" %}
-{% block title %}NHL Pace{% endblock %}
+{% block title %}Stats | NHL{% endblock %}
 {% block body %}
 <div class="jumbotron" style="margin-top:6.5rem;">
-  <h1>NHL Pace Stats</h1>
+  <h1>NHL Base Stats</h1>
 </div>
-{% for table in tables %}
-            {{ table|safe }}
-{% endfor %}
+
+<div class="container-fluid" style="overflow:scroll;max-height:60vh">
+  <table id="base-nhl-stats" class="table table-sm table-striped table-hover" data-sortable="true" >
+    <thead>
+      <tr>
+        <th data-sortable="true" scope="col">TEAM</th>
+        {% for col in table.columns %}
+        <th data-sortable="true" scope="col">{{col}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for i, team in table.iterrows() %}
+      <tr>
+        <th scope="row">{{i}}</th>
+        {% for val in team %}
+        <td class="base-nhl">{{val}}</td>
+        {% endfor %}  
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $(function() {
+    $('#base-nhl-stats').bootstrapTable()
+  });
+  
+</script>
+
 {% endblock %}

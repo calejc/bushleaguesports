@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-import requests, json, sys, os, sqlite3
-sys.path.append('..')
-import app.utils.urls as urls, app.utils.helpers as helpers, app.utils.data as data
-import pandas as pd, numpy as np, seaborn as sns
-import datetime as dt
+import requests, json, sys, os, sqlite3, datetime as dt
+import pandas as pd, numpy as np, seaborn as sns, app.utils.data as data
+from app.utils.urls import *
+from app.utils.helpers import * 
 
 
 
@@ -14,8 +12,8 @@ def return_market(sport_key, region, mkt):
         sites_list = data.US_SITES
     elif region == 'uk':
         sites_list = data.UK_SITES
-    dd = helpers.return_alt(data.SPORTS, sport_key, 'sport_data')
-    url = urls.get_odds_url(sport_key, region, mkt)
+    dd = return_alt(data.SPORTS, sport_key, 'sport_data')
+    url = get_odds_url(sport_key, region, mkt)
     response = requests.get(url)
     if response.status_code is 200:
         data_dict = response.json()
@@ -31,7 +29,7 @@ def return_market(sport_key, region, mkt):
         upcoming, contains_pinnacle, contains_secondary = True, False, False
         for game in data_dict['data']:
             game_date = dt.datetime.fromtimestamp(game['commence_time']).date()
-            gid = int(helpers.game_ids(3, game_date, game_counter)) # create our own IDs here
+            gid = int(game_ids(3, game_date, game_counter)) # create our own IDs here
             h_team = game['home_team']
             for team in game['teams']:
                 if team != h_team:
@@ -58,7 +56,7 @@ def return_market(sport_key, region, mkt):
                 tm_idx = game['teams'].index(team)
                 if site_idx is not None:
                     if mkt == 'h2h':
-                        odds = helpers.convert_odds(game['sites'][site_idx]['odds'][mkt][tm_idx])
+                        odds = convert_odds(game['sites'][site_idx]['odds'][mkt][tm_idx])
                     elif mkt == 'spreads':
                         odds = game['sites'][site_idx]['odds'][mkt]['points'][tm_idx]
                     elif mkt == 'totals':
@@ -67,6 +65,7 @@ def return_market(sport_key, region, mkt):
                     odds = 0
                 odds_dict[counter] = {
                     'game_id': gid,
+                    'date': game_date,
                     'team': team,
                     'opp': opp,
                     '{}'.format(mkt): odds
@@ -102,7 +101,7 @@ def return_tm_totals(sport, *args):
     df = pd.merge(
         return_market(sport_key, region, mkt),
         return_market(sport_key, region, 'totals'),
-        on = ['game_id', 'team', 'opp']
+        on = ['game_id', 'date', 'team', 'opp']
     )
     if slate_arg:
         df = slate_df.merge(df, how='left', on=['team', 'opp'])
@@ -110,9 +109,9 @@ def return_tm_totals(sport, *args):
         df = df[(df != 0).all(1)]
     for index, row in df.iterrows():
         if sport_key == 'americanfootball_nfl' or sport_key == 'basketball_nba' or sport_key == 'basketball_ncaab' or sport_key == 'americanfootball_ncaaf':
-            t = helpers.spreads_team_total(float(row['spreads']), float(row['totals']))
+            t = spreads_team_total(float(row['spreads']), float(row['totals']))
         else:
-            t = helpers.team_total(float(row['h2h']), float(row['totals']))
+            t = team_total(float(row['h2h']), float(row['totals']))
 
         tm_totals[counter] = {
             'team': row['team'],
@@ -121,58 +120,8 @@ def return_tm_totals(sport, *args):
         counter += 1
     tm_totals = pd.DataFrame.from_dict(tm_totals, orient='index')
     df_odds = df.merge(tm_totals, how='left', on=['team'])
-    df_odds = df_odds[['game_id', 'team', 'opp', mkt, 'totals', 'tm_total']]
+    df_odds = df_odds[['game_id', 'date', 'team', 'opp', mkt, 'totals', 'tm_total']]
     df_odds = df_odds.sort_values(by=['game_id'])
-
-
-    styles = [
-        dict(
-            selector="tr:hover",
-            props=[("background-color", "#d9d9d9")]
-        ),
-        dict(
-            selector="th",
-            props=[
-                ("text-align", "center"),
-                ("margin-left", "10px")
-            ]
-        ),
-    ]
-
-    cm = sns.light_palette("green", as_cmap=True)
-    df_final = df_odds.style.background_gradient(
-        cmap=cm,
-        axis=0,
-        subset=(pd.IndexSlice[2:], df_odds.select_dtypes(float).columns)
-    ).set_precision(2).hide_index().hide_columns(['game_id']).set_table_styles(styles).render()
-
-    return df_final
-
-
-
-
-# Used for testing. Read a csv file into dataframe instead of continuing to make API calls
-def testing():
-
-    styles = [
-        dict(
-            selector="tr:hover",
-            props=[("background-color", "#d9d9d9")]
-        ),
-        dict(
-            selector="th",
-            props=[
-                ("text-align", "center"),
-                ("margin-left", "10px")
-            ]
-        ),
-    ]
-
-    df_initial = pd.read_csv("dataframe.csv")
-    cm = sns.light_palette("green", as_cmap=True)
-    df = df_initial.style.background_gradient(
-        cmap=cm,
-        axis=0,
-        subset=(pd.IndexSlice[2:], df_initial.select_dtypes(float).columns)
-    ).set_precision(2).hide_index().hide_columns(['game_id']).set_table_styles(styles).render()
-    return df
+    df_odds.set_index('date', inplace=True)
+    df_odds.drop(columns=['game_id'], inplace=True)
+    return df_odds
