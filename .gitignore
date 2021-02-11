@@ -6,7 +6,6 @@ __pycache__
 lib64
 *.cfg
 *.ini
-Procfile
 *.csv
 .env
 *.rst
